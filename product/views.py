@@ -53,3 +53,15 @@ def review_detail_api_view(request, id):
     
     serializer = ReviewSerializer(review)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def products_with_reviews(request):
+    products = Product.objects.all()
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def category_list_api_view(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
