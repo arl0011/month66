@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from product import views
-from .views import category_list_create_api_view, category_detail_api_view, product_list_create_api_view, product_detail_api_view,review_list_create_api_view,review_detail_api_view
-
+from .views import category_list_create_api_view, category_detail_api_view, product_list_create_api_view, product_detail_api_view,review_list_create_api_view,review_detail_api_view , register_user,confirm_user
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('categories/', views.category_list_api_view),
@@ -21,5 +21,7 @@ urlpatterns = [
     path('products/<int:id>/', product_detail_api_view),
     path('reviews/', review_list_create_api_view),
     path('reviews/<int:id>/', review_detail_api_view),
-
+    path('users/register/', register_user),
+    path('users/login/', obtain_auth_token),
+    path('users/confirm/', confirm_user),
 ]
