@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Category, Product, Review
+from .models import Category, Product, Review,UserConfirmation
+from django.contrib.auth.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
     products_count = serializers.SerializerMethodField()
@@ -67,3 +68,20 @@ class ProductSerializer(serializers.ModelSerializer):
             return None
         total = sum(review.stars for review in reviews)
         return round(total / reviews.count(), 2)    
+    
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password'],
+            is_active=False  # неактивный до подтверждения
+        )
+        UserConfirmation.objects.create(user=user)
+        return user
