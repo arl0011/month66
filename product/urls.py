@@ -1,27 +1,24 @@
 from django.contrib import admin
 from django.urls import path
 from product import views
-from .views import category_list_create_api_view, category_detail_api_view, product_list_create_api_view, product_detail_api_view,review_list_create_api_view,review_detail_api_view , register_user,confirm_user
+from .views import (
+    CategoryListCreateAPIView, CategoryDetailAPIView,
+    ProductListCreateAPIView, ProductDetailAPIView,
+    ReviewListCreateAPIView, ReviewDetailAPIView,
+    RegisterUserAPIView, ConfirmUserAPIView,
+)
+
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
-    path('categories/', views.category_list_api_view),
-    path('categories/<int:id>/', views.category_detail_api_view),
-
-    path('products/', views.product_list_api_view),
-    path('products/<int:id>/', views.product_detail_api_view),
-
-    path('reviews/', views.review_list_api_view),
-    path('reviews/<int:id>/', views.review_detail_api_view),
-    path('products/reviews/', views.products_with_reviews),
-    path('categories/', views.category_list_api_view),
-    path('categories/', category_list_create_api_view),
-    path('categories/<int:id>/', category_detail_api_view),
-    path('products/', product_list_create_api_view),
-    path('products/<int:id>/', product_detail_api_view),
-    path('reviews/', review_list_create_api_view),
-    path('reviews/<int:id>/', review_detail_api_view),
-    path('users/register/', register_user),
+    path('categories/', CategoryListCreateAPIView.as_view(), name='category-list-create'),
+    path('categories/<int:id>/', CategoryDetailAPIView.as_view(), name='category-detail'),
+    path('products/', ProductListCreateAPIView.as_view(), name='product-list-create'),
+    path('products/<int:id>/', ProductDetailAPIView.as_view(), name='product-detail'),
+    path('reviews/', ReviewListCreateAPIView.as_view(), name='review-list-create'),
+    path('reviews/<int:id>/', ReviewDetailAPIView.as_view(), name='review-detail'),
+    path('users/register/', RegisterUserAPIView.as_view(), name='user-register'),
+    path('users/confirm/', ConfirmUserAPIView.as_view(), name='user-confirm'),
     path('users/login/', obtain_auth_token),
-    path('users/confirm/', confirm_user),
+    
 ]
