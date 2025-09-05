@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 import random
+from django.conf import settings
 
 
 class Category(models.Model):
@@ -29,7 +30,7 @@ class Review(models.Model):
     
 
 class UserConfirmation(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='confirmation')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='confirmation')
     code = models.CharField(max_length=6)
     is_confirmed = models.BooleanField(default=False)
 

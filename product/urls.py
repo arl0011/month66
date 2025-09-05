@@ -21,4 +21,6 @@ urlpatterns = [
     path('users/confirm/', ConfirmUserAPIView.as_view(), name='user-confirm'),
     path('users/login/', obtain_auth_token),
     
+    
+
 ]
