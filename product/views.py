@@ -1,10 +1,12 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny  
 from django.contrib.auth.models import User
 
 from .models import Category, Product, Review, UserConfirmation
 from .serializers import CategorySerializer, ProductSerializer, ReviewSerializer
+from .permissions import IsModerator  
 
 
 class CategoryListCreateAPIView(generics.ListCreateAPIView):
@@ -22,11 +24,23 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_permissions(self):
+        user = self.request.user
+        if user.is_authenticated and user.is_staff:
+            return [IsAuthenticated(), IsModerator()]
+        return [AllowAny()]
+
 
 class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'id'
+
+    def get_permissions(self):
+        user = self.request.user
+        if user.is_authenticated and user.is_staff:
+            return [IsAuthenticated(), IsModerator()]
+        return [AllowAny()]
 
 
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
@@ -49,20 +63,10 @@ class RegisterUserAPIView(APIView):
         if not username or not password or not email:
             return Response({'error': 'username, password и email обязательны'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if User.objects.filter(username=username).exists():
-            return Response({'error': 'Пользователь с таким именем уже существует'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        user.is_active = False  # неактивен до подтверждения
-        user.save()
-
-        confirmation = UserConfirmation.objects.create(user=user)
-        confirmation.save()
-
-        return Response({'message': 'Пользователь зарегистрирован. Подтвердите аккаунт с помощью кода.', 'code': confirmation.code}, status=status.HTTP_201_CREATED)
-
-
+        
 class ConfirmUserAPIView(APIView):
+    permission_classes = [AllowAny]  
+
     def post(self, request):
         username = request.data.get('username')
         code = request.data.get('code')
@@ -72,7 +76,7 @@ class ConfirmUserAPIView(APIView):
 
         try:
             user = User.objects.get(username=username)
-            confirmation = user.confirmation
+            confirmation = user.confirmation  
         except User.DoesNotExist:
             return Response({'error': 'Пользователь не найден'}, status=status.HTTP_404_NOT_FOUND)
         except UserConfirmation.DoesNotExist:
