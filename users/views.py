@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, CustomTokenObtainPairSerializer
 from django.contrib.auth import login
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class RegisterView(APIView):
@@ -26,6 +27,10 @@ class LoginView(APIView):
             login(request, user)
             return Response({"message": "Login successful"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 # Create your views here.
